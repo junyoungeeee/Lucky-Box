@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>행운부적 · Lucky Box</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Gothic+A1:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== SCREEN 1 : BOX (sender — add photo) ===== -->
+  <section class="screen active" id="screen-box">
+    <div class="statusbar">
+      <span class="time">9:41</span>
+      <span class="sysicons">●●● &nbsp;📶 &nbsp;🔋</span>
+    </div>
+    <div class="screen-body">
+      <h1 class="title">행운부적을 만들어요</h1>
+
+      <div class="box-wrap">
+        <img src="image/box.png" alt="행운상자" class="box-img" draggable="false">
+      </div>
+
+      <button class="btn-green" id="pick-btn">
+        <span class="btn-ic">🖼️</span> 눌러서 내 사진 넣기
+      </button>
+      <p class="hint" id="box-hint"></p>
+      <input type="file" id="file-input" accept="image/*" hidden>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN 2 : BOX (receiver — open tape) ===== -->
+  <section class="screen" id="screen-box2">
+    <div class="statusbar">
+      <span class="time">9:41</span>
+      <span class="sysicons">●●● &nbsp;📶 &nbsp;🔋</span>
+    </div>
+    <div class="screen-body">
+      <h1 class="title">행운상자가 왔어요</h1>
+
+      <div class="box-wrap" id="box-wrap2">
+        <div class="emerge-glow" id="emerge-glow"></div>
+        <img src="image/lamp_t.png" alt="요술 램프" class="emerge-lamp" id="emerge-lamp" draggable="false">
+        <img src="image/box.png" alt="행운상자" class="box-img box-closed" id="box-img2" draggable="false">
+        <img src="image/open box.png" alt="열린 행운상자" class="box-img box-opened-img" id="box-open-img" draggable="false">
+      </div>
+
+      <p class="hint" id="box-hint2">&nbsp;</p>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN 2 : LAMP ===== -->
+  <section class="screen" id="screen-lamp">
+    <div class="statusbar">
+      <span class="time">9:41</span>
+      <span class="sysicons">●●● &nbsp;📶 &nbsp;🔋</span>
+    </div>
+    <div class="screen-body center">
+      <h1 class="title rub-title">램프를 문질러봐!</h1>
+      <div class="lamp-wrap" id="lamp-wrap">
+        <div class="lamp-glow" id="lamp-glow"></div>
+        <img src="image/lamp_t.png" alt="요술 램프" class="lamp-img" id="lamp-img" draggable="false">
+      </div>
+      <div class="rub-progress" id="rub-progress"><i></i></div>
+      <p class="hint" id="lamp-hint">램프를 쓱쓱 문질러 보세요</p>
+    </div>
+    <div class="flash" id="flash"></div>
+  </section>
+
+  <!-- ===== SCREEN 3 : CHARM ===== -->
+  <section class="screen" id="screen-charm">
+    <div class="statusbar">
+      <span class="time">9:41</span>
+      <span class="sysicons">●●● &nbsp;📶 &nbsp;🔋</span>
+    </div>
+    <div class="screen-body center">
+      <div class="charm-wrap" id="charm-wrap">
+        <img src="image/main.png" alt="행운부적" class="charm-img" id="charm-img" draggable="false">
+        <svg class="charm-photo" id="charm-svg" viewBox="0 0 1086 1448" preserveAspectRatio="xMidYMid meet">
+          <defs><clipPath id="cloverClip"><path id="clover-path" d=""/></clipPath></defs>
+          <image id="charm-photo-img" clip-path="url(#cloverClip)" preserveAspectRatio="xMidYMid slice"></image>
+        </svg>
+      </div>
+      <div class="charm-actions">
+        <button class="btn-green" id="save-btn"><span class="btn-ic">⬇️</span> 저장하기</button>
+        <button class="icon-btn" id="share-btn" aria-label="공유">🔗</button>
+      </div>
+    </div>
+    <div class="celebrate" id="celebrate"></div>
+  </section>
+
+</div>
+<canvas id="export-canvas" width="1086" height="1448" hidden></canvas>
+<audio id="box-sound" src="image/box_open.wav" preload="auto"></audio>
+<script src="app.js"></script>
+</body>
+</html>
