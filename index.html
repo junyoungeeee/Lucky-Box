@@ -6,7 +6,7 @@
 <title>행운부적 · Lucky Box</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Gothic+A1:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -14,13 +14,7 @@
 
   <!-- ===== SCREEN 1 : BOX (sender — add photo) ===== -->
   <section class="screen active" id="screen-box">
-    <div class="statusbar">
-      <span class="time">9:41</span>
-      <span class="sysicons">●●● &nbsp;📶 &nbsp;🔋</span>
-    </div>
     <div class="screen-body">
-      <h1 class="title">행운부적을 만들어요</h1>
-
       <div class="box-wrap">
         <img src="image/box.png" alt="행운상자" class="box-img" draggable="false">
       </div>
@@ -33,14 +27,20 @@
     </div>
   </section>
 
-  <!-- ===== SCREEN 2 : BOX (receiver — open tape) ===== -->
-  <section class="screen" id="screen-box2">
-    <div class="statusbar">
-      <span class="time">9:41</span>
-      <span class="sysicons">●●● &nbsp;📶 &nbsp;🔋</span>
+  <!-- ===== SCREEN 2 : MESSAGE — 햄스터2 ===== -->
+  <section class="screen msg-screen" id="screen-msg1" data-next="screen-box2">
+    <div class="screen-body center">
+      <div class="msg-pics one">
+        <img src="image/햄스터2.jpg" alt="햄스터" draggable="false">
+      </div>
+      <p class="msg-line type-line" id="msg1-line">면접 준비 하느라 힘들지? ㅠㅠ</p>
     </div>
+  </section>
+
+  <!-- ===== SCREEN 3 : BOX (receiver — open tape) ===== -->
+  <section class="screen" id="screen-box2">
     <div class="screen-body">
-      <h1 class="title">행운상자가 왔어요</h1>
+      <h1 class="title sparkle-title">내가 선물을 준비했어</h1>
 
       <div class="box-wrap" id="box-wrap2">
         <div class="emerge-glow" id="emerge-glow"></div>
@@ -49,35 +49,49 @@
         <img src="image/open box.png" alt="열린 행운상자" class="box-img box-opened-img" id="box-open-img" draggable="false">
       </div>
 
-      <p class="hint" id="box-hint2">&nbsp;</p>
+      <p class="hint" id="box-hint2">상자를 뜯어봐</p>
     </div>
   </section>
 
-  <!-- ===== SCREEN 2 : LAMP ===== -->
+  <!-- ===== SCREEN 4 : LAMP ===== -->
   <section class="screen" id="screen-lamp">
-    <div class="statusbar">
-      <span class="time">9:41</span>
-      <span class="sysicons">●●● &nbsp;📶 &nbsp;🔋</span>
-    </div>
     <div class="screen-body center">
-      <h1 class="title rub-title">램프를 문질러봐!</h1>
+      <h1 class="title rub-title sparkle-title sparkle-gold">램프를 문질러줘!</h1>
       <div class="lamp-wrap" id="lamp-wrap">
         <div class="lamp-glow" id="lamp-glow"></div>
         <img src="image/lamp_t.png" alt="요술 램프" class="lamp-img" id="lamp-img" draggable="false">
       </div>
       <div class="rub-progress" id="rub-progress"><i></i></div>
-      <p class="hint" id="lamp-hint">램프를 쓱쓱 문질러 보세요</p>
     </div>
     <div class="flash" id="flash"></div>
   </section>
 
-  <!-- ===== SCREEN 3 : CHARM ===== -->
-  <section class="screen" id="screen-charm">
-    <div class="statusbar">
-      <span class="time">9:41</span>
-      <span class="sysicons">●●● &nbsp;📶 &nbsp;🔋</span>
-    </div>
+  <!-- ===== SCREEN 5 : MESSAGE — 햄스터 ===== -->
+  <section class="screen msg-screen" id="screen-msg2" data-next="screen-msg3">
+    <div class="clover-rain" data-rain></div>
     <div class="screen-body center">
+      <div class="msg-pics one">
+        <img src="image/햄스터.png" alt="햄스터" class="pic-big" draggable="false">
+      </div>
+      <p class="msg-line">면접관 분들이 무서워도</p>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN 6 : MESSAGE — 강아지 + 후회 ===== -->
+  <section class="screen msg-screen" id="screen-msg3" data-next="screen-charm">
+    <div class="screen-body center">
+      <div class="msg-stage">
+        <img src="image/저를 놓치면 크게 후회하실 겁니다.jpg" alt="저를 놓치면 크게 후회하실 겁니다" class="pic-regret" draggable="false">
+        <img src="image/강아지.jpg" alt="강아지" class="pic-dog" draggable="false">
+      </div>
+      <p class="msg-line big red glow-red">다 씹어먹고와</p>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN 7 : CHARM ===== -->
+  <section class="screen" id="screen-charm">
+    <div class="screen-body center">
+      <p class="msg-line charm-line sparkle-title sparkle-gold pink-text">합격 확률 +100000%<br>올려주는 부적</p>
       <div class="charm-wrap" id="charm-wrap">
         <img src="image/main.png" alt="행운부적" class="charm-img" id="charm-img" draggable="false">
         <svg class="charm-photo" id="charm-svg" viewBox="0 0 1086 1448" preserveAspectRatio="xMidYMid meet">
@@ -85,6 +99,7 @@
           <image id="charm-photo-img" clip-path="url(#cloverClip)" preserveAspectRatio="xMidYMid slice"></image>
         </svg>
       </div>
+      <p class="msg-line charm-line green">행운은 이미 네 편</p>
       <div class="charm-actions">
         <button class="btn-green" id="save-btn"><span class="btn-ic">⬇️</span> 저장하기</button>
         <button class="icon-btn" id="share-btn" aria-label="공유">🔗</button>

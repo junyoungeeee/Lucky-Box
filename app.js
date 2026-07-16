@@ -9,10 +9,98 @@ let userPhoto = null; // dataURL of chosen photo
 
 const $ = (id) => document.getElementById(id);
 
+// Hidden screens still live in the render tree, so their CSS animations run from
+// page load and are long finished by the time you arrive. Replay them on entry.
+function restartAnims(screen) {
+  screen.querySelectorAll('.pic-regret, .pic-dog, .msg-pics img, .msg-line').forEach(el => {
+    el.style.animation = 'none';
+    void el.offsetWidth;      // force reflow so the restart takes
+    el.style.animation = '';
+  });
+}
+
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $(id).classList.add('active');
+  restartAnims($(id));
+  // clovers rain only on the screen you're actually looking at
+  document.querySelectorAll('[data-rain]').forEach(layer => {
+    if (layer.closest('.screen').id === id) startRain(layer);
+    else stopRain(layer);
+  });
+  if (id === 'screen-msg1') typeLine($('msg1-line'));
 }
+
+// reveal the line one letter at a time
+function typeLine(el) {
+  if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+  el.textContent = '';
+  [...el.dataset.text].forEach((ch, i) => {
+    const s = document.createElement('span');
+    s.className = 'ch';
+    s.textContent = ch === ' ' ? ' ' : ch;   // inline-block collapses a plain space
+    s.style.animationDelay = (i * 0.042) + 's';
+    el.appendChild(s);
+  });
+}
+
+
+/* ---------------- CLOVER RAIN ---------------- */
+const CLOVERS = [1, 2, 3, 4, 5, 6, 7].map(n => `image/clover/clover-${n}.png`);
+const rainTimers = new Map();
+
+function spawnClover(layer) {
+  const img = document.createElement('img');
+  img.src = CLOVERS[(Math.random() * CLOVERS.length) | 0];
+  const size = 24 + Math.random() * 42;
+  const h = layer.clientHeight || 700;
+  img.style.width = size + 'px';
+  if (Math.random() < 0.35) {                 // a third blow in from the sides
+    const fromLeft = Math.random() < 0.5;
+    img.style.left = (fromLeft ? -size : layer.clientWidth) + 'px';
+    img.style.top = (-30 - Math.random() * 90) + 'px';
+    img.style.setProperty('--dx', (fromLeft ? 1 : -1) * (130 + Math.random() * 190) + 'px');
+  } else {                                    // the rest drop from the top
+    img.style.left = (Math.random() * 100) + '%';
+    img.style.setProperty('--dx', (Math.random() * 130 - 65) + 'px');
+  }
+  img.style.setProperty('--fall', (h + 260) + 'px');
+  img.style.setProperty('--spin', (Math.random() * 720 - 360) + 'deg');
+  img.style.animation = `cloverFall ${4.5 + Math.random() * 4}s linear forwards`;
+  img.addEventListener('animationend', () => img.remove());
+  layer.appendChild(img);
+}
+
+function startRain(layer) {
+  if (rainTimers.has(layer)) return;
+  for (let i = 0; i < 5; i++) setTimeout(() => spawnClover(layer), i * 240);
+  rainTimers.set(layer, setInterval(() => {
+    if (layer.childElementCount < 26) spawnClover(layer);
+  }, 520));
+}
+
+function stopRain(layer) {
+  clearInterval(rainTimers.get(layer));
+  rainTimers.delete(layer);
+  layer.innerHTML = '';
+}
+
+/* ---------------- MESSAGE SCREENS (tap to continue) ---------------- */
+// Each .msg-screen advances to data-next on tap. A short lock-out keeps the tap
+// that arrived on the previous screen from skipping this one.
+document.querySelectorAll('.msg-screen').forEach(sc => {
+  let armedAt = 0;
+  new MutationObserver(() => {
+    if (sc.classList.contains('active')) armedAt = performance.now() + 700;
+  }).observe(sc, { attributes: true, attributeFilter: ['class'] });
+
+  sc.addEventListener('click', () => {
+    if (performance.now() < armedAt) return;
+    const next = sc.dataset.next;
+    if (next === 'screen-charm') { buildCharm(); showScreen(next); playCelebrate(); }
+    else showScreen(next);
+  });
+});
 
 /* ---------------- SCREEN 1 : BOX ---------------- */
 const pickBtn = $('pick-btn');
@@ -55,7 +143,7 @@ fileInput.addEventListener('change', (e) => {
     boxOpened = false;
     [emergeLamp, emergeGlow, boxClosed, boxOpenImg].forEach(el => el.style.transition = '');
     setOpen(0);
-    showScreen('screen-box2');   // move to the received box to open it
+    showScreen('screen-msg1');   // greeting first, then the received box
   };
   reader.readAsDataURL(file);
 });
@@ -97,6 +185,7 @@ fileInput.addEventListener('change', (e) => {
 function finishOpen() {
   if (boxOpened) return;
   boxOpened = true;
+  boxWrap.classList.add('opened');      // stop the idle sway
   const snd = $('box-sound');           // cardboard box opening sound (~2s)
   if (snd) { try { snd.currentTime = 0; snd.play(); } catch (e) {} }
   buzz([30, 30, 70]);
@@ -160,7 +249,7 @@ function triggerLamp() {
   lampGlow.classList.add('show');   // yellow light bursts and covers the lamp
   lampImg.classList.add('dim');     // lamp dissolves into the light
   setTimeout(() => flash.classList.add('go'), 350); // screen fills yellow
-  setTimeout(() => { buildCharm(); showScreen('screen-charm'); playCelebrate(); }, 1150);
+  setTimeout(() => { showScreen('screen-msg2'); flash.classList.remove('go'); }, 1150);
 }
 
 /* ---------------- SCREEN 3 : CHARM ---------------- */
@@ -181,24 +270,41 @@ function buildCharm() {
   charmWrap.classList.remove('pop'); void charmWrap.offsetWidth; charmWrap.classList.add('pop');
 }
 
+const THUMB = 'image/엄지척.png';
+let celebrateTimer = null;
+
+// one thumbs-up or clap, rising from the bottom
+function spawnCel(layer) {
+  let el;
+  if (Math.random() < 0.5) {
+    el = document.createElement('img');
+    el.src = THUMB;
+    el.className = 'cel cel-img';
+    el.style.width = (32 + Math.random() * 34) + 'px';
+  } else {
+    el = document.createElement('span');
+    el.className = 'cel';
+    el.textContent = Math.random() < 0.82 ? '👏' : '✨';
+    el.style.fontSize = (26 + Math.random() * 18) + 'px';
+  }
+  el.style.left = (3 + Math.random() * 90) + '%';
+  el.style.setProperty('--rise', -(380 + Math.random() * 320) + 'px');
+  el.style.setProperty('--drift', (Math.random() * 90 - 45) + 'px');
+  el.style.setProperty('--rot', (Math.random() * 120 - 60) + 'deg');
+  el.style.animation = `rise ${1.9 + Math.random() * 1.1}s ease-out forwards`;
+  el.addEventListener('animationend', () => el.remove());
+  layer.appendChild(el);
+}
+
 function playCelebrate() {
   const layer = $('celebrate');
   layer.innerHTML = '';
-  // clap & clover icons rising from bottom to top
-  const emojis = ['👏', '🍀', '🎉', '👏', '✨', '🍀', '🎊', '👏', '🍀', '⭐'];
-  emojis.forEach((em, i) => {
-    const s = document.createElement('span');
-    s.className = 'cel';
-    s.textContent = em;
-    s.style.left = (6 + Math.random() * 88) + '%';
-    s.style.setProperty('--rise', -(340 + Math.random() * 280) + 'px');
-    s.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
-    s.style.setProperty('--rot', (Math.random() * 120 - 60) + 'deg');
-    s.style.fontSize = (24 + Math.random() * 16) + 'px';
-    s.style.animation = `rise ${1.6 + Math.random() * .8}s ease-out forwards`;
-    s.style.animationDelay = (Math.random() * .5) + 's';
-    layer.appendChild(s);
-  });
+  clearInterval(celebrateTimer);
+  // opening burst, then keep them coming
+  for (let i = 0; i < 12; i++) setTimeout(() => spawnCel(layer), i * 110);
+  celebrateTimer = setInterval(() => {
+    if (layer.childElementCount < 30) spawnCel(layer);
+  }, 340);
   // confetti also rising
   const colors = ['#6BAF4B', '#F3B33F', '#E0402F', '#4C9CDD', '#9B5FBE'];
   for (let i = 0; i < 28; i++) {
@@ -209,9 +315,9 @@ function playCelebrate() {
     c.style.setProperty('--rise', -(300 + Math.random() * 300) + 'px');
     c.style.animation = `riseConfetti ${1.5 + Math.random() * .9}s ease-out forwards`;
     c.style.animationDelay = (Math.random() * .5) + 's';
+    c.addEventListener('animationend', () => c.remove());
     layer.appendChild(c);
   }
-  setTimeout(() => { layer.innerHTML = ''; }, 3600);
 }
 
 /* ---- Save (composite charm to PNG) ---- */

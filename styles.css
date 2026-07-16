@@ -6,8 +6,11 @@
   --clover-deep:#4E9137;
   --gold:#F3B33F;
   --green-trans:rgba(107,175,75,0.18);
-  --font-title:'Black Han Sans',sans-serif;
-  --font-round:'Jua',sans-serif;
+  --pink:#FF6FA5;
+  --pink-deep:#E23C7E;
+  --gold-deep:#E9A400;
+  --font-title:'Gothic A1',sans-serif;
+  --font-round:'Gothic A1',sans-serif;
   --font-body:'Gothic A1',sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -34,12 +37,6 @@ body{
 }
 .screen.active{opacity:1;visibility:visible;transform:none;}
 
-.statusbar{
-  height:54px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
-  padding:0 22px;font-family:var(--font-body);font-weight:700;font-size:15px;
-}
-.statusbar .sysicons{font-size:11px;letter-spacing:1px;opacity:.75;}
-
 .screen-body{
   flex:1 1 auto;display:flex;flex-direction:column;align-items:center;
   justify-content:center;
@@ -47,16 +44,121 @@ body{
 }
 .screen-body.center{justify-content:center;}
 
+/* sticker text — pink fill with a white outline, like the reference photo */
 .title{
-  font-family:var(--font-round);font-weight:400;font-size:24px;margin:0;
-  color:var(--ink);text-align:center;
+  font-family:var(--font-round);font-weight:900;font-size:28px;margin:0;
+  color:var(--pink);text-align:center;line-height:1.35;
+  -webkit-text-stroke:4.5px #000;paint-order:stroke fill;
+  text-shadow:0 3px 0 rgba(0,0,0,.25);
 }
-.rub-title{font-size:30px;}
+.rub-title{font-size:34px;}
+
 .hint{font-family:var(--font-body);font-weight:600;font-size:13px;color:#8A8371;margin:0;text-align:center;}
+
+/* ===== MESSAGE SCREENS ===== */
+.msg-screen{cursor:pointer;}
+.msg-screen .screen-body{gap:26px;padding:24px 12px 40px;}
+.msg-pics{display:flex;gap:12px;width:100%;justify-content:center;align-items:center;}
+.msg-pics img{
+  display:block;object-fit:cover;
+  animation:picIn .5s cubic-bezier(.2,1.2,.4,1) both;
+}
+.msg-pics.one img{width:min(300px,78vw);max-height:46vh;}
+@keyframes picIn{0%{transform:scale(.7) rotate(-4deg);opacity:0}100%{transform:none;opacity:1}}
+
+/* msg2 — the photo is landscape (1.6:1), so to fill a portrait screen it runs
+   wider than the frame and lets the sides crop. Stays big; no shrinking. */
+.msg-pics.one img.pic-big{
+  width:140%;max-width:none;max-height:none;flex:0 0 auto;
+}
+
+/* msg3 stage — the dog blinks around while the "regret" pic keeps growing */
+.msg-stage{
+  position:relative;width:100%;height:54vh;
+  display:flex;align-items:center;justify-content:center;
+}
+.msg-stage img{position:absolute;display:block;object-fit:cover;}
+
+/* shows up second, then swells the whole time */
+/* big and still — no growing */
+.pic-regret{width:min(360px,88vw);z-index:1;}
+
+/* snaps from spot to spot — holds still, then jumps. stays visible throughout */
+.pic-dog{
+  width:min(128px,30vw);z-index:2;
+  animation:dogRoam 5s steps(1,end) infinite;
+}
+@keyframes dogRoam{
+  0%    {transform:translate(-118px,-140px) rotate(-8deg)}
+  16.6% {transform:translate(116px,-112px) rotate(7deg)}
+  33.3% {transform:translate(4px,-160px) rotate(-4deg)}
+  50%   {transform:translate(122px,96px) rotate(9deg)}
+  66.6% {transform:translate(-112px,140px) rotate(-6deg)}
+  83.3% {transform:translate(10px,158px) rotate(5deg)}
+  100%  {transform:translate(-118px,-140px) rotate(-8deg)}
+}
+
+.msg-line{
+  font-family:var(--font-round);font-weight:900;font-size:28px;margin:0;text-align:center;line-height:1.4;
+  color:var(--pink);-webkit-text-stroke:4.5px #000;paint-order:stroke fill;
+  text-shadow:0 3px 0 rgba(0,0,0,.25);
+  animation:picIn .5s cubic-bezier(.2,1.2,.4,1) .25s both;
+}
+.msg-line.big{font-size:40px;}
+.msg-line.red{color:#E0402F;}
+.msg-line.green{color:var(--clover);}
+/* typed out one letter at a time */
+.type-line{animation:none;}
+.type-line .ch{display:inline-block;animation:chIn .26s cubic-bezier(.22,.61,.36,1) both;}
+@keyframes chIn{
+  0%{opacity:0;transform:translateY(-5px) scale(.92)}
+  100%{opacity:1;transform:none}
+}
+/* steady red glow — no blinking */
+.msg-line.glow-red{
+  text-shadow:0 3px 0 rgba(0,0,0,.25),0 0 10px rgba(224,64,47,1),0 0 24px rgba(224,64,47,.9),0 0 46px rgba(224,64,47,.65);
+}
+.charm-line{font-size:24px;animation:none;}
+
+/* ---- glowing sticker text (must sit after .title/.msg-line to win) ---- */
+.sparkle-title{position:relative;animation:pinkGlow 1.8s ease-in-out infinite;}
+@keyframes pinkGlow{
+  0%,100%{text-shadow:0 3px 0 rgba(0,0,0,.25),0 0 7px rgba(255,111,165,.75),0 0 16px rgba(255,111,165,.45);}
+  50%{text-shadow:0 3px 0 rgba(0,0,0,.25),0 0 12px rgba(255,111,165,1),0 0 26px rgba(255,111,165,.85),0 0 44px rgba(255,111,165,.5);}
+}
+.sparkle-title::before,.sparkle-title::after{
+  content:"✨";position:absolute;font-size:20px;
+  -webkit-text-stroke:0;text-shadow:none;pointer-events:none;
+  animation:twinkle 1.5s ease-in-out infinite;
+}
+.sparkle-title::before{left:-24px;top:-14px;}
+.sparkle-title::after{right:-24px;bottom:-10px;animation-delay:.75s;}
+@keyframes twinkle{
+  0%,100%{opacity:.2;transform:scale(.65) rotate(-12deg)}
+  50%{opacity:1;transform:scale(1.15) rotate(14deg)}
+}
+/* same treatment in deep yellow — lamp screen + charm caption */
+.sparkle-gold{color:var(--gold-deep);animation-name:goldGlow;}
+/* pink letters, yellow glow */
+.sparkle-gold.pink-text{color:var(--pink);}
+@keyframes goldGlow{
+  0%,100%{text-shadow:0 3px 0 rgba(0,0,0,.25),0 0 7px rgba(243,179,63,.75),0 0 16px rgba(243,179,63,.45);}
+  50%{text-shadow:0 3px 0 rgba(0,0,0,.25),0 0 12px rgba(251,224,138,1),0 0 26px rgba(243,179,63,.9),0 0 46px rgba(243,179,63,.55);}
+}
+
+/* ---- clovers drifting down from the top / sides ---- */
+.clover-rain{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:4;}
+.clover-rain img{position:absolute;top:-90px;display:block;will-change:transform;}
+@keyframes cloverFall{
+  0%{transform:translate(0,0) rotate(0);opacity:0}
+  8%{opacity:1}
+  90%{opacity:1}
+  100%{transform:translate(var(--dx),var(--fall)) rotate(var(--spin));opacity:0}
+}
 
 /* ---- buttons ---- */
 .btn-green{
-  font-family:var(--font-round);font-size:18px;color:var(--clover-deep);
+  font-family:var(--font-round);font-weight:700;font-size:17px;color:var(--clover-deep);
   background:var(--green-trans);border:2px solid var(--clover);
   border-radius:16px;padding:15px 24px;cursor:pointer;
   display:inline-flex;align-items:center;gap:8px;transition:transform .1s, background .2s;
@@ -73,11 +175,20 @@ body{
 .box-wrap{position:relative;width:300px;max-width:80vw;user-select:none;}
 /* box2: title lower (top-aligned) + gap gives the popping lamp room to clear it */
 #screen-box2 .screen-body{justify-content:flex-start;padding-top:140px;gap:110px;}
+/* the 110px gap is there to give the popping lamp room — pull just the hint back up */
+#box-hint2{margin-top:-88px;}
 #box-wrap2{aspect-ratio:1;}
 .box-img{width:100%;display:block;pointer-events:none;position:relative;z-index:1;}
 /* box2 overlays a closed + open box image that crossfade as it opens */
 #box-wrap2 .box-img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;}
 #box-open-img{opacity:0;}
+/* box rocks side to side until it gets opened */
+#box-wrap2 .box-img{animation:boxSway 1.5s ease-in-out infinite;transform-origin:50% 85%;}
+#box-wrap2.opened .box-img{animation:none;}
+@keyframes boxSway{
+  0%,100%{transform:translateX(-7px) rotate(-4deg)}
+  50%{transform:translateX(7px) rotate(4deg)}
+}
 /* box shakes as it bursts open */
 .box-wrap.opening .box-img{animation:boxshake .55s ease both;}
 @keyframes boxshake{
@@ -138,17 +249,20 @@ body{
 @keyframes flash{0%{opacity:0}35%{opacity:0}75%{opacity:1}100%{opacity:1}}
 
 /* ===== SCREEN 3 : CHARM ===== */
-.charm-wrap{position:relative;width:330px;max-width:86vw;}
+/* two captions + buttons now share this screen, so tighten it up */
+#screen-charm .screen-body{gap:16px;padding:8px 26px 28px;}
+.charm-wrap{position:relative;width:300px;max-width:78vw;}
 .charm-wrap.pop{animation:charmpop .6s cubic-bezier(.2,1.3,.5,1) both;}
 @keyframes charmpop{0%{transform:scale(.4) rotate(-6deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
 .charm-img{width:100%;display:block;}
 .charm-photo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
-.charm-actions{display:flex;gap:12px;width:330px;max-width:86vw;}
+.charm-actions{display:flex;gap:12px;width:300px;max-width:78vw;margin-top:18px;position:relative;z-index:6;}
 .charm-actions .btn-green{flex:1;justify-content:center;}
 
 /* celebration icons — rise from bottom to top */
 .celebrate{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:5;}
 .cel{position:absolute;bottom:-8%;font-size:30px;will-change:transform,opacity;}
+.cel-img{display:block;height:auto;filter:drop-shadow(0 3px 5px rgba(0,0,0,.14));}
 @keyframes rise{
   0%{transform:translateY(0) translateX(0) scale(.6) rotate(0);opacity:0}
   12%{opacity:1}
